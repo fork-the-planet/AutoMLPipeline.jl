@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ClusterWorkflowTemplate
+metadata:
+  name: automlai-prediction-classification
+spec:
+  entrypoint: run-prediction-classification
+  arguments:
+    parameters:
+      - name: url
+        value: http://sunrise-mlflow-tracking.mlflow:5080
+      - name: input
+        value: iris.csv
+      - name: predictiontype
+        value: classification
+      - name: runid
+        value: 8dbea59123ec469db3ee7b807b3ab6d9
+  templates:
+    - name: run-prediction-classification
+      inputs:
+        parameters:
+          - name: url
+          - name: input
+          - name: predictiontype
+          - name: runid
+        artifacts:
+          - name: file
+            path: /inputfile
+            s3:
+              key: csv/
+      container:
+        image: ppalmes/automlai:v3.0
+        command:
+        args:
+          - "-u{{inputs.parameters.url}}"
+          - "-t{{inputs.parameters.predictiontype}}"
+          - "-p"
+          - "-r{{inputs.parameters.runid}}"
+          - "/inputfile/{{inputs.parameters.input}}"

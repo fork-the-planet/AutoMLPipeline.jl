@@ -1,12 +1,23 @@
 module AutoAI
 
 using Reexport
+@reexport using AutoMLPipeline
 @reexport using AMLPipelineBase
+
+using CSV
+using DataFrames
 using AMLPipelineBase.AbsTypes
 export fit, fit!, transform, transform!, fit_transform, fit_transform!
 import AMLPipelineBase.AbsTypes: fit!, transform!, fit, transform
 using AMLPipelineBase: AbsTypes, Utils
-@reexport using AutoMLPipeline
+
+export get_iris
+
+
+function get_iris()
+  iris = CSV.read(joinpath(Base.@__DIR__, "../../data", "iris.csv"), DataFrame)
+  return iris
+end
 
 # -------------
 include("autoclassification.jl")
@@ -17,5 +28,14 @@ include("autoregression.jl")
 using .AutoRegressions
 export AutoRegression
 
-greet() = print("Hello World!")
+include("automlflowclassification.jl")
+using .AutoMLFlowClassifications
+export AutoMLFlowClassification
+export mlfcldriver
+
+include("automlflowregression.jl")
+using .AutoMLFlowRegressions
+export AutoMLFlowRegression
+export mlfregdriver
+
 end # module AutoAI
